@@ -1,1 +1,4 @@
 /target
+/days/*
+!/days/.gitkeep
+/.idea
