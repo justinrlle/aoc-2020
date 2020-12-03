@@ -91,9 +91,9 @@ fn part_2_bytes(input: &str) -> usize {
     input.lines()
         .map(str::as_bytes)
         .map(parse_line_bytes)
-        .filter(|(policy, password)| unsafe {
-            let first = *password.get_unchecked(usize::from(policy.first) - 1);
-            let second = *password.get_unchecked(usize::from(policy.second) - 1);
+        .filter(|(policy, password)| {
+            let first = password[usize::from(policy.first) - 1];
+            let second = password[usize::from(policy.second) - 1];
             first != second && (first == policy.letter || second == policy.letter)
         }).count()
 }
