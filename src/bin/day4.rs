@@ -13,7 +13,8 @@ pub fn part_1(input: &str) -> usize {
 }
 
 mod checks {
-    pub fn year(field: &str, lower: u16, upper: u16) -> bool {
+    #[inline]
+    fn year(field: &str, lower: u16, upper: u16) -> bool {
         if field.len() != 8 {
             return false;
         }
@@ -22,27 +23,38 @@ mod checks {
             .unwrap_or(false)
     }
 
+    #[inline]
+    pub fn byr(field: &str) -> bool {
+        year(field, 1920, 2002)
+    }
+    #[inline]
+    pub fn iyr(field: &str) -> bool {
+        year(field, 2010, 2020)
+    }
+    #[inline]
+    pub fn eyr(field: &str) -> bool {
+        year(field, 2020, 2030)
+    }
+
+    #[inline]
     pub fn hgt(field: &str) -> bool {
         if field.len() != 8 && field.len() != 9 {
             return false;
         }
         let unit = &field[field.len() - 2..];
-        if unit != "cm" && unit != "in" {
+        let (lower, upper) = if unit == "cm" {
+            (150, 193)
+        } else if unit == "in" {
+            (59, 76)
+        } else {
             return false;
-        }
+        };
         field[4..field.len() - 2].parse::<u16>()
-            .map(|height| {
-                if unit == "cm" {
-                    height >= 150 && height <= 193
-                } else if unit == "in" {
-                    height >= 59 && height <= 76
-                } else {
-                    unreachable!();
-                }
-            })
+            .map(|height| height >= lower && height <= upper)
             .unwrap_or(false)
     }
 
+    #[inline]
     pub fn hcl(field: &str) -> bool {
         if field.len() != 11 || field.as_bytes()[4] != b'#' {
             return false;
@@ -51,11 +63,13 @@ mod checks {
             .all(|c| (c <= b'9' && c >= b'0') || (c <= b'f' && c >= b'a'))
     }
 
+    #[inline]
     pub fn ecl(field: &str) -> bool {
         static COLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
         field.len() == 7 && COLORS.contains(&&field[4..])
     }
 
+    #[inline]
     pub fn pid(field: &str) -> bool {
         field.len() == 13 && field[4..].bytes().all(|c| c <= b'9' && c >= b'0')
     }
@@ -68,9 +82,9 @@ pub fn part_2(input: &str) -> usize {
                 .filter(|l| !l.is_empty())
                 .try_fold(0u8, |mask, field| {
                     let valid = match &field[0..3] {
-                        "byr" => if checks::year(field, 1920, 2002) { 0b0000_0001 } else { return Err(()); },
-                        "iyr" => if checks::year(field, 2010, 2020) { 0b0000_0010 } else { return Err(()); },
-                        "eyr" => if checks::year(field, 2020, 2030) { 0b0000_0100 } else { return Err(()); },
+                        "byr" => if checks::byr(field) { 0b0000_0001 } else { return Err(()); },
+                        "iyr" => if checks::iyr(field) { 0b0000_0010 } else { return Err(()); },
+                        "eyr" => if checks::eyr(field) { 0b0000_0100 } else { return Err(()); },
                         "hgt" => if checks::hgt(field) { 0b0000_1000 } else { return Err(()); },
                         "hcl" => if checks::hcl(field) { 0b0001_0000 } else { return Err(()); },
                         "ecl" => if checks::ecl(field) { 0b0010_0000 } else { return Err(()); },
