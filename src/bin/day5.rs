@@ -13,22 +13,39 @@ fn find_pos(part: &[u8], min: u8, max: u8, go_down: u8, go_up: u8) -> u8 {
         });
     if last == go_down { part.0 } else { part.1 }
 }
+fn seat_id(seat: &[u8]) -> usize {
+    let row_part = &seat[..7];
+    let row = find_pos(row_part, 0, 127, b'F', b'B');
+    let col_part = &seat[7..];
+    let col = find_pos(col_part, 0, 7, b'L', b'R');
+    ((row as usize) * 8) + (col as usize)
+}
 
 pub fn part_1(input: &str) -> usize {
     input.lines()
-        .map(|line| {
-            let row_part = &line.as_bytes()[..7];
-            let row = find_pos(row_part, 0, 127, b'F', b'B');
-            let col_part = &line.as_bytes()[7..];
-            let col = find_pos(col_part, 0, 7, b'L', b'R');
-            ((row as usize) * 8) + (col as usize)
-        })
+        .map(str::as_bytes)
+        .map(seat_id)
         .max()
         .unwrap()
 }
 
+pub fn part_2(input: &str) -> usize {
+    let mut ids = input.lines()
+        .map(str::as_bytes)
+        .map(seat_id)
+        .collect::<Vec<_>>();
+    ids.sort_unstable();
+    let gap = ids.windows(2).find(|&pair| {
+        let prev = pair[0];
+        let next = pair[1];
+        prev + 1 != next
+    }).unwrap();
+    gap[0] + 1
+}
+
+
 pub fn main() {
-    aoc_2020::day!(5, part_1);
+    aoc_2020::day!(5, part_1, part_2);
 }
 
 #[test]
