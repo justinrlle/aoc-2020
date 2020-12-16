@@ -1,9 +1,28 @@
+use std::fmt::Display;
+use std::str::FromStr;
+
 pub fn day_input(day: u8) -> String {
     let path = format!("./days/{}", day);
     match std::fs::read_to_string(&path) {
         Ok(content) => content,
         Err(e) => panic!("failed to read {}: {}", path, e),
     }
+}
+
+pub fn parse_all<'a, T: FromStr>(input: &'a str) -> impl Iterator<Item=T> + 'a
+    where <T as FromStr>::Err: Display {
+    input.lines()
+        .enumerate()
+        .map(|(idx, l)| {
+            l.parse::<T>()
+                .map_err(|e|
+                    format!("failed to parse {} (line {})\n  could not parse into {}: {}",
+                            l,
+                            idx,
+                            std::any::type_name::<T>(),
+                            e))
+                .unwrap()
+        })
 }
 
 #[macro_export]

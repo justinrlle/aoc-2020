@@ -5,7 +5,7 @@ pub fn part_1(input: &str) -> u32 {
         .map(|group| {
             group.into_iter()
                 .filter(|&&c| c >= b'a' && c <= b'z')
-                .fold(0, |mask, &answer| mask | 1 << (answer - b'a'))
+                .fold(0u32, |mask, &answer| mask | 1 << (answer - b'a'))
                 .count_ones()
         })
         .sum()

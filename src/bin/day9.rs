@@ -2,13 +2,7 @@ use std::collections::{BTreeSet, HashMap};
 
 
 fn part_1_inner(input: &str, preamble_size: usize) -> u64 {
-    let nbs = input.lines()
-        .enumerate()
-        .map(|(idx, l)| {
-            l.parse::<u64>()
-                .map_err(|e| format!("failed to parse {} (line {}) into a number: {}", l, idx, e))
-                .unwrap()
-        })
+    let nbs = aoc_2020::parse_all(input)
         .collect::<Vec<_>>();
 
     fn is_nb_invalid(nb: u64, preamble: &BTreeSet<u64>) -> bool {
